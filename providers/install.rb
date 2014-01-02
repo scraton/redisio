@@ -209,6 +209,20 @@ def configure
           :includes               => current['includes']
         })
       end
+      #Setup conf.d file for gentoo systems
+      template "/etc/conf.d/redis#{server_name}" do
+        source 'redis.confd.erb'
+        cookbook 'redisio'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        variables({
+          :configuration_file => "#{current['configdir']}/#{server_name}.conf",
+          :user => current['user'],
+          :group => current['group']
+        })
+        only_if { node['platform'] == 'gentoo' }
+      end
       #Setup init.d file
       bin_path = "/usr/local/bin"
       bin_path = ::File.join(node['redisio']['install_dir'], 'bin') if node['redisio']['install_dir']
